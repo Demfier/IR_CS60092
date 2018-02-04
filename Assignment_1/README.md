@@ -1,8 +1,6 @@
 # IR_CS60092
 
-This repo contains IR assignment solution.
-
-For Assignment 1 solution, please go through the following points to know the code structure:
+Please go through the following points to know the code structure for assignment 1 solution:
 1. `Results.pdf` contains performance comparision for the 3 systems
 2. `main.py` contains code for grep-based and index-based retrieval. `jsonify.py` and `build_inverted_index.py` are helper modules for them.
 3. `evaluate.py` is the evaluation script for the three systems.
