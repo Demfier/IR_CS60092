@@ -23,29 +23,39 @@ def stats(retrieved, relevant):
     recall = float(tp) / len(relevant)
     return({'precision': precision, 'recall': recall})
 
-if __name__ == '__main__':
-    # Evaluate boolean retrieval system ==> <Start>
-    with open('output/bool_retrieval_json_output.json') as data:
-        boolean_data = json.load(data)
 
-    bool_total_time = 0
-    bool_performance = {}
-    for qid in boolean_data:
-        result = stats(set(boolean_data[qid]['system_response']),
-                       set(boolean_data[qid]['ground_truth']))
-        bool_total_time += boolean_data[qid]['time_taken']
+def evaluate(system='grep'):
+    """
+    Evaluates the different retreival systems built. By default evaluates the
+    grep based boolean retrieval system
+    """
+    if system == 'grep':
+        with open('output/bool_retrieval_json_output.json') as system:
+            data = json.load(system)
+    elif system == 'index':
+        with open('output/index_based_bool_retrieval.json') as system:
+            data = json.load(system)
 
-        if bool_performance == {}:
-            bool_performance['precision'] = [result['precision']]
-            bool_performance['recall'] = [result['recall']]
+    total_time = 0
+    performance = {}
+    for qid in data:
+        result = stats(set(data[qid]['system_response']),
+                       set(data[qid]['ground_truth']))
+        total_time += data[qid]['time_taken']
+
+        if performance == {}:
+            performance['precision'] = [result['precision']]
+            performance['recall'] = [result['recall']]
         else:
-            bool_performance['precision'].append(result['precision'])
-            bool_performance['recall'].append(result['recall'])
+            performance['precision'].append(result['precision'])
+            performance['recall'].append(result['recall'])
 
-    qw_precision = bool_performance['precision']  # query wise prec
-    qw_recall = bool_performance['recall']  # query wise rec
+    qw_precision = performance['precision']  # query wise prec
+    qw_recall = performance['recall']  # query wise rec
     # Does the macro averaging of P an R
-    bool_performance['precision'] = sum(qw_precision) / len(qw_precision)
-    bool_performance['recall'] = sum(qw_recall) / len(qw_recall)
-    print(bool_performance, bool_total_time)
-    # Evaluate boolean retrieval system ==> <End>
+    performance['precision'] = sum(qw_precision) / len(qw_precision)
+    performance['recall'] = sum(qw_recall) / len(qw_recall)
+    return(performance, total_time)
+
+if __name__ == '__main__':
+    print(evaluate(system='index'))

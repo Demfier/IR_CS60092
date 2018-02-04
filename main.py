@@ -132,6 +132,10 @@ def index_based_retrieval():
     with open('output/inverted_index.json') as iindex:
         inverted_index = json.load(iindex)
 
+    # load doc => docID mapping
+    with open('output/docID_map.json') as docIdmap:
+        id_to_doc = json.load(docIdmap)
+
     for qid in input_data:
         posting_lists = []
         start = time.clock()
@@ -145,7 +149,8 @@ def index_based_retrieval():
 
         # get intersection of all the posting lists
         result = intersection(posting_lists)
-        input_data[qid]['system_response'] = result
+        input_data[qid]['system_response'] = [id_to_doc[str(docID)] for
+                                              docID in result]
         input_data[qid]['time_taken'] = time.clock() - start
         print("query {0} ({1} seconds) => {2}".format(qid,
                                                       time.clock() - start,
