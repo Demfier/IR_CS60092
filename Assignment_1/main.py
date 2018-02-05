@@ -149,5 +149,5 @@ def index_based_retrieval():
 
 
 if __name__ == '__main__':
-    # index_based_retrieval()
-    grep_based_retrieval()
+    index_based_retrieval()
+    # grep_based_retrieval()
