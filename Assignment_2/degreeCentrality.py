@@ -49,7 +49,7 @@ def summarize(input_dir, threshold=0.1, method='DC'):
     output_dir = 'output/{}/{}'.format(threshold, method)
     if not os.path.exists(output_dir):
         os.makedirs(output_dir)
-    with open('{}/{}.txt'.format(output_dir, input_dir.strip('/')), 'w') as deg_out:
+    with open('{}/{}.1'.format(output_dir, input_dir.strip('/')), 'w') as deg_out:
         deg_out.write(summary)
 
 
@@ -59,5 +59,5 @@ def summarize_all(input_dirs, threshold=0.1, method='DC'):
 
 
 if __name__ == '__main__':
-    summarize_all(INPUT_DIRS, threshold=0.1, method='DC')
-    # summarize(INPUT_DIRS, method='TR')
+    for threshold in [0.1, 0.2, 0.3]:
+        summarize_all(INPUT_DIRS, threshold, method='DC')

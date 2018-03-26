@@ -82,9 +82,6 @@ def build_inv_index(input_dir):
         doc_inverted_indexes.append(indexify(word_tokens, idx))
         print("Finished {0} => {1}".format(idx, doc))
 
-    with open('output/{}_docID_map.json'.format(input_dir.strip('/')), 'w') as doc_map:
-        json.dump(docID_to_file, doc_map)
-
     # merge all the individual document inverted indexes
     inverted_index = collections.defaultdict(list)
     for dictionary in doc_inverted_indexes:
@@ -182,10 +179,10 @@ def build_graph(tf_idf_vectors, threshold=0.1, for_tr=False):
 
         delta = 1
         i = 0
-        while(delta > e):
+        while(delta > epsilon):
             p_prev = p_mat
             p_mat = np.matmul(m_mat.T, p_prev)
             delta = np.linalg.norm(p_mat - p_prev)
             i = i + 1
-    final_mat = np.argsort(degree)[::-1]
-    return(final_mat, degree)
+    p_mat = np.argsort(degree)[::-1]
+    return(p_mat, degree)
