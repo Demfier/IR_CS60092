@@ -82,7 +82,7 @@ def build_inv_index(input_dir):
         doc_inverted_indexes.append(indexify(word_tokens, idx))
         print("Finished {0} => {1}".format(idx, doc))
 
-    with open('output/{}_docID_map.json'.format(input_dir), 'w') as doc_map:
+    with open('output/{}_docID_map.json'.format(input_dir.strip('/')), 'w') as doc_map:
         json.dump(docID_to_file, doc_map)
 
     # merge all the individual document inverted indexes
@@ -154,7 +154,7 @@ def cosine_similarity(vect1, vect2):
     return c_sim
 
 
-def build_graph(tf_idf_vectors, threshold=0.1):
+def build_graph(tf_idf_vectors, threshold=0.1, for_tr=False):
     """
     Builds graph for degree centrality approach using tf-idf vectors
     """
@@ -172,5 +172,20 @@ def build_graph(tf_idf_vectors, threshold=0.1):
 
     # degree of centrality
     degree = np.sum(adjusted_mat, axis=0)
+    if for_tr:
+        b_mat = np.array([np.divide(val, degree[i]) for i, val in enumerate(adjusted_mat)])
+        U = np.tile(float(1) / total_sentences, (total_sentences, total_sentences))
+        d = 0.2  # degree of randomness
+        m_mat = np.multiply(d / total_sentences, U) + np.multiply(1 - d, b_mat)
+        p_mat = np.tile(float(1) / total_sentences, (total_sentences, 1))
+        epsilon = 1e-18
+
+        delta = 1
+        i = 0
+        while(delta > e):
+            p_prev = p_mat
+            p_mat = np.matmul(m_mat.T, p_prev)
+            delta = np.linalg.norm(p_mat - p_prev)
+            i = i + 1
     final_mat = np.argsort(degree)[::-1]
     return(final_mat, degree)
