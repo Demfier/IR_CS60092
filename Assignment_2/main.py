@@ -57,6 +57,7 @@ def summarize(input_dirs, method='DC'):
     else:
         raise NotImplementedError
 
+
 if __name__ == '__main__':
     summarize(INPUT_DIRS, method='DC')
     # summarize(INPUT_DIRS, method='TR')

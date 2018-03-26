@@ -108,7 +108,7 @@ def vectorize(sentence, t_id, idf):
             vector[t_id[word]] += 1
         except KeyError:
             vector[t_id[word]] = 1
-    vector = {key: vector[key]*idf[key] for key in vector}
+    vector = {key: vector[key] * idf[key] for key in vector}
     return(vector)
 
 
@@ -122,14 +122,18 @@ def build_tf_idf_vectors(input_dir, inverted_index):
 
     for idx, term in enumerate(inverted_index.keys()):
         t_id[term] = idx
-        idf[t_id[term]] = math.log(float(N) / len(inverted_index[term])) / math.log(10)
+        idf[t_id[term]] = math.log(
+            float(N) / len(inverted_index[term])) / math.log(10)
 
     sent_map = {}
     vect_sent_map = {}
     for doc_id, doc in enumerate(os.listdir(input_dir)):
         html_data = open(input_dir + doc, 'r').read().strip()
         soup = BeautifulSoup(html_data, 'lxml')
-        tokenized_sentences = nltk.tokenize.sent_tokenize(soup.body.get_text())
+        content = ''
+        for para in soup.findAll('p'):
+            content += para.text
+        tokenized_sentences = nltk.tokenize.sent_tokenize(content)
         for sent_id, sentence in enumerate(tokenized_sentences):
             vector = vectorize(sentence, t_id, idf)
             if len(vector) != 0:
@@ -144,7 +148,8 @@ def cosine_similarity(vect1, vect2):
     """
     d_vec1 = sum([value**2 for value in vect1.values()])
     d_vec2 = sum([value**2 for value in vect2.values()])
-    n_vec = sum([vect1[key]*vect2[key] for key in set(vect1.keys()).intersection(set(vect2.keys()))])
+    n_vec = sum([vect1[key] * vect2[key]
+                 for key in set(vect1.keys()).intersection(set(vect2.keys()))])
     c_sim = float(n_vec) / (math.sqrt(d_vec1 * d_vec2))
     return c_sim
 
@@ -160,7 +165,8 @@ def build_graph(tf_idf_vectors, threshold=0.1):
     adjusted_mat = np.zeros((total_sentences, total_sentences))
     for i, s_id1 in enumerate(tf_idf_vectors):
         for j, s_id2 in enumerate(tf_idf_vectors):
-            c_mat[i][j] = cosine_similarity(tf_idf_vectors[s_id1], tf_idf_vectors[s_id2])
+            c_mat[i][j] = cosine_similarity(
+                tf_idf_vectors[s_id1], tf_idf_vectors[s_id2])
             if c_mat[i][j] >= threshold:
                 adjusted_mat[i][j] = 1
 
